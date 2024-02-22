@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace De
 {
@@ -18,6 +19,7 @@ namespace De
 
         private void LoadData()
         {
+            
             flowLayoutPanel1.Controls.Clear();
             using (ModelDB db = new ModelDB())
             {
@@ -27,6 +29,7 @@ namespace De
                             select new
                             {
                                 Name = sale.Title,
+                                AgentEmail = agent.Email,
                                 Count = sale.ProductCount,
                                 Number = agent.Phone,
                                 TypeAgent = agent.AgentTypeID,
@@ -53,6 +56,7 @@ namespace De
                         Label3 = list[i].Number,
                         Label4 = list[i].AgentPriority.ToString(),
                         Label5 = disc.ToString() + "%"
+
                     };
                     userAgent.AddPicture(list[i].Picture);
                     flowLayoutPanel1.Controls.Add(userAgent);
@@ -96,5 +100,74 @@ namespace De
                 LoadData();
             }
         }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            string searchText = textBox1.Text.ToLower(); // Приводим текст поиска к нижнему регистру для регистронезависимого поиска
+
+            //foreach (Control control in flowLayoutPanel1.Controls)
+            //{
+            //    if (control is UserAgent userAgent)
+            //    {
+            //        if (userAgent.Label3.ToLower().Contains(searchText))//Label3 содержит номер
+            //        {
+            //            userAgent.Visible = true;
+            //        }
+            //        else
+            //        {
+            //            userAgent.Visible = false;
+            //        }
+            //    }
+            //}
+            flowLayoutPanel1.Controls.Clear();
+            using (ModelDB db = new ModelDB())
+            {
+                var users = from agent in db.Agent
+                            join sale in db.ProductSale on agent.Title equals sale.AgentID
+                            join product in db.Product on sale.Title equals product.Title
+                            select new
+                            {
+                                Name = sale.Title,
+                                AgentEmail = agent.Email,
+                                Count = sale.ProductCount,
+                                Number = agent.Phone,
+                                TypeAgent = agent.AgentTypeID,
+                                Agent = agent.Title,
+                                AgentPriority = agent.Priority,
+                                Picture = agent.Logo
+                            };
+
+
+                var list = users.Where(p=>
+                        p.AgentEmail.StartsWith(searchText)|| 
+                        p.TypeAgent.StartsWith(searchText)||
+                        p.Agent.StartsWith(searchText) ||
+                        p.Number.StartsWith(searchText)).ToList();
+                for (int i = current; i < Math.Min(current + 10, list.Count); i++)
+                {
+                    int disc = 0;
+                    if (list[i].Count < 10000) disc = 0;
+                    else if (list[i].Count > 10000 && list[i].Count < 50000) disc = 5;
+                    else if (list[i].Count > 50000 && list[i].Count < 150000) disc = 10;
+                    else if (list[i].Count > 150000 && list[i].Count < 500000) disc = 20;
+                    else disc = 25;
+
+                    UserAgent userAgent = new UserAgent()
+                    {
+                        Label1 = list[i].TypeAgent + "|" + list[i].Agent,
+                        Label2 = list[i].Count + " продаж за год",
+                        Label3 = list[i].Number,
+                        Label4 = list[i].AgentPriority.ToString(),
+                        Label5 = disc.ToString() + "%"
+
+                    };
+                    userAgent.AddPicture(list[i].Picture);
+                    flowLayoutPanel1.Controls.Add(userAgent);
+                }
+            }
+
+        }
+
+
     }
 }
