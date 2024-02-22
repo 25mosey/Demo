@@ -120,7 +120,7 @@ namespace De
             //    }
             //}
             flowLayoutPanel1.Controls.Clear();
-            using (ModelDB db = new ModelDB())
+            using (ModelDB db = new ModelDB()) 
             {
                 var users = from agent in db.Agent
                             join sale in db.ProductSale on agent.Title equals sale.AgentID
