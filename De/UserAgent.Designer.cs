@@ -110,6 +110,7 @@
             this.Controls.Add(this.pictureBox1);
             this.Name = "UserAgent";
             this.Size = new System.Drawing.Size(1000, 150);
+            this.DoubleClick += new System.EventHandler(this.UserAgent_DoubleClick);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

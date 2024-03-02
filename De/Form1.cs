@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -16,8 +17,7 @@ namespace De
             InitializeComponent();
             LoadData();
         }
-
-        private void LoadData()
+        public void LoadData()
         {
             
             flowLayoutPanel1.Controls.Clear();
@@ -63,6 +63,7 @@ namespace De
                 }
             }
         }
+       
 
         private void button2_Click(object sender, EventArgs e)
         {
@@ -78,7 +79,11 @@ namespace De
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            flowLayoutPanel1.Controls.Clear();
+            if (comboBox1.Text.ToString() == "наименование")
+            {
+               
+            }
         }
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
@@ -86,8 +91,7 @@ namespace De
             if (radioButton1.Checked)
             {
                 // Сортировка по возрастанию
-                sortingOption += " (возрастание)";
-                LoadData();
+               
             }
         }
 
@@ -169,5 +173,31 @@ namespace De
         }
 
 
+
+        private void button3_Click ( object sender, EventArgs e )
+        {
+            Form2 addForm = new Form2();
+            if (addForm.ShowDialog() == DialogResult.OK)
+            {
+                using (ModelDB db = new ModelDB())
+                {
+                    Agent agent = new Agent();
+                    agent.Title = addForm.textBox1.Text;
+                    agent.Logo = addForm.Foto;
+                    agent.Address = addForm.textBox2.Text;
+                    agent.Email = addForm.textBox3.Text;
+                    agent.Phone = addForm.textBox4.Text;
+                    agent.DirectorName = addForm.textBox5.Text;
+                    agent.INN = addForm.textBox6.Text;
+                    agent.KPP = addForm.textBox7.Text;
+                    agent.Priority = int.Parse(addForm.textBox8.Text);
+                    agent.AgentTypeID = addForm.comboBox1.SelectedItem.ToString();
+                    agent.AgentType = db.AgentType.Where(p => p.Title == addForm.comboBox1.SelectedItem.ToString()).FirstOrDefault();
+                    db.Agent.Add(agent);
+                    db.SaveChanges();
+                }
+                LoadData();
+            }
+        }
     }
 }

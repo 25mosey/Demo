@@ -45,5 +45,42 @@ namespace De
             if(path!="")
                 pictureBox1.Image=Image.FromFile(Environment.CurrentDirectory + path);
         }
+
+        private void UserAgent_DoubleClick ( object sender, EventArgs e )
+        {
+            
+            Form2 edit = new Form2();
+            edit.textBox1.Text = Label1.Split('|')[1];
+            using (ModelDB db=new ModelDB())
+            {
+                string title = Label1.Split('|')[1].Trim();
+                Agent agent= db.Agent.Where(p => p.Title == title).FirstOrDefault();
+                edit.comboBox1.Text = agent.AgentTypeID;
+                edit.textBox1.Text = agent.Title;
+                edit.textBox2.Text = agent.Address;
+                edit.textBox3.Text = agent.Email;
+                edit.textBox4.Text = agent.Phone;
+                edit.textBox5.Text = agent.DirectorName;
+                edit.textBox6.Text = agent.INN;
+                edit.textBox7.Text = agent.KPP;
+                edit.textBox8.Text = agent.Priority.ToString();
+                edit.LoadFoto(agent.Logo);
+                edit.ForEdit = true;
+                if (edit.ShowDialog() == DialogResult.OK)
+                {
+                    agent.Title = edit.textBox1.Text;
+                    agent.AgentTypeID = edit.comboBox1.Text;
+                    agent.Address = edit.textBox2.Text;
+                    agent.Email = edit.textBox3.Text;
+                    agent.Phone = edit.textBox4.Text;
+                    agent.DirectorName = edit.textBox5.Text;
+                    agent.INN = edit.textBox6.Text;
+                    agent.KPP = edit.textBox7.Text;
+                    agent.Priority = int.Parse(edit.textBox8.Text);
+                    db.SaveChanges();
+                    ( ParentForm as Form1 ).LoadData();
+                }
+            }
+        }
     }
 }
